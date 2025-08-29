@@ -3,1157 +3,808 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORE SYSTEM - ПОДАРОЧНЫЕ КОДЫ</title>
+    <title>CORE SYSTEM</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Courier New', monospace;
         }
         
         body {
-            background: #0a0a1a;
-            color: #00ffff;
-            overflow: hidden;
-            height: 100vh;
-            position: relative;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
         
-        #particles-js {
-            position: absolute;
+        /* Фон с символами Гастера */
+        .gaster-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 0;
+            font-size: 10px;
+            line-height: 2;
+            animation: gasterScroll 120s infinite linear;
+            color: rgba(255, 255, 255, 0.1);
+            white-space: pre-wrap;
         }
         
-        .container {
-            display: flex;
-            height: 100vh;
-            position: relative;
+        @keyframes gasterScroll {
+            0% { transform: translateY(100vh); }
+            100% { transform: translateY(-100vh); }
+        }
+        
+        .gaster-symbol {
+            position: fixed;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
             z-index: 1;
+            animation: gasterFloat 15s infinite ease-in-out;
+            user-select: none;
         }
         
-        .sidebar {
-            width: 250px;
-            background: rgba(26, 26, 46, 0.9);
-            padding: 20px;
-            border-right: 2px solid #00ffff;
-            backdrop-filter: blur(5px);
+        @keyframes gasterFloat {
+            0%, 100% { opacity: 0.1; transform: translateY(0px) rotate(0deg); }
+            50% { opacity: 0.3; transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        /* Основной контейнер */
+        .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Заголовок */
+        .header {
+            text-align: center;
+            padding: 80px 20px 60px;
+            background: linear-gradient(180deg, #000, #111);
+        }
+        
+        .main-title {
+            font-size: 48px;
+            font-weight: normal;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Навигация */
+        .navigation {
             display: flex;
-            flex-direction: column;
-        }
-        
-        .main-content {
-            flex: 1;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
             padding: 20px;
-            overflow-y: auto;
+            background: #111;
         }
         
-        .user-card {
-            background: rgba(10, 10, 26, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #00ffff;
-            transition: transform 0.3s;
-        }
-        
-        .user-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
-        }
-        
-        .subscription-card {
-            background: rgba(26, 26, 46, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #ff00ff;
-            animation: pulse 2s infinite;
-            backdrop-filter: blur(5px);
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.8); }
-            100% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.5); }
-        }
-        
-        .code-section {
-            background: rgba(10, 10, 26, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #00ffff;
-            margin-bottom: 20px;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s;
-        }
-        
-        .code-section:hover {
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-            position: relative;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 5px;
-            color: #00ffff;
-            font-weight: bold;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(26, 26, 46, 0.8);
-            border: 1px solid #00ffff;
-            color: #00ffff;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-        
-        .btn {
+        .nav-button {
             padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
+            background: transparent;
+            border: 2px solid #444;
+            color: #ccc;
             cursor: pointer;
-            font-weight: bold;
+            font-family: inherit;
+            font-size: 14px;
             transition: all 0.3s;
+            min-width: 120px;
             position: relative;
-            overflow: hidden;
         }
         
-        .btn:disabled {
+        .nav-button:hover {
+            border-color: #666;
+            color: #fff;
+        }
+        
+        .nav-button.active {
+            border-color: #fff;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-button.active::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            z-index: -1;
+            animation: buttonGlow 2s infinite;
+        }
+        
+        @keyframes buttonGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* Основной контент */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            min-height: 80vh;
+        }
+        
+        .content-page {
+            display: none;
+            animation: pageSlide 0.5s ease;
+        }
+        
+        .content-page.active {
+            display: block;
+        }
+        
+        @keyframes pageSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Стили для страниц */
+        .page-title {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .text-content {
+            line-height: 1.8;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .text-content h2 {
+            font-size: 24px;
+            margin: 40px 0 20px 0;
+            color: #00ffff;
+        }
+        
+        .text-content h3 {
+            font-size: 20px;
+            margin: 30px 0 15px 0;
+            color: #ff00ff;
+        }
+        
+        .text-content p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .text-content ul {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+        
+        .text-content li {
+            margin-bottom: 10px;
+        }
+        
+        /* Система кодов */
+        .code-system {
+            background: rgba(17, 17, 17, 0.8);
+            border: 2px solid #333;
+            padding: 40px;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .code-system::before {
+            content: "☜☠❄☜☼ ❄☟☜ 👍⚐👎☜";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 10px;
+            opacity: 0.3;
+        }
+        
+        .user-profile {
+            background: rgba(46, 26, 46, 0.8);
+            border: 2px solid #ff00ff;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .subscription-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        
+        .badge-basic {
+            background: linear-gradient(45deg, #4a90e2, #7b68ee);
+        }
+        
+        .badge-max-neo {
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+        }
+        
+        .badge-developer {
+            background: linear-gradient(45deg, #ff0080, #8000ff);
+            animation: devGlow 2s infinite;
+        }
+        
+        @keyframes devGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 128, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 128, 0.8); }
+        }
+        
+        .code-input-area {
+            background: rgba(26, 26, 66, 0.8);
+            border: 2px solid #00ffff;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .code-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background: #111;
+            border: 2px solid #333;
+            color: #fff;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .code-input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        .activate-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .activate-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+        }
+        
+        .activate-button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
         
-        .btn-primary {
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            color: #000;
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
-        }
-        
-        .btn-secondary {
-            background: rgba(0, 255, 255, 0.2);
-            color: #00ffff;
-            border: 1px solid #00ffff;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(0, 255, 255, 0.3);
-        }
-        
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .feature-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-        }
-        
-        .feature-list li:before {
-            content: "✓";
-            margin-right: 10px;
-            color: #00ffff;
-        }
-        
-        .feature-list li:last-child {
-            border-bottom: none;
-        }
-        
         .status-message {
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 15px;
+            margin-top: 20px;
+            padding: 15px;
             text-align: center;
             font-weight: bold;
-            animation: fadeIn 0.5s;
+            border: 2px solid;
+            display: none;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .success {
+        .status-success {
             background: rgba(0, 255, 0, 0.1);
+            border-color: #00ff00;
             color: #00ff00;
-            border: 1px solid #00ff00;
         }
         
-        .error {
+        .status-error {
             background: rgba(255, 0, 0, 0.1);
+            border-color: #ff0000;
             color: #ff0000;
-            border: 1px solid #ff0000;
         }
         
-        .vip-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            color: #000;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-left: 10px;
-            animation: glow 2s infinite;
-        }
-        
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.8); }
-            100% { box-shadow: 0 0 5px rgba(255, 0, 255, 0.5); }
+        .codes-list {
+            background: rgba(66, 46, 26, 0.8);
+            border: 2px solid #ff9900;
+            padding: 30px;
+            margin: 30px 0;
         }
         
         .code-item {
-            padding: 10px;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 153, 0, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background 0.3s;
         }
         
-        .code-item:hover {
-            background: rgba(0, 255, 255, 0.1);
+        .code-item:last-child {
+            border-bottom: none;
         }
         
         .code-value {
-            font-family: monospace;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 5px 10px;
-            border-radius: 4px;
+            font-family: inherit;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border: 1px solid #555;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        /* Админ панель */
+        .admin-panel {
+            background: rgba(66, 26, 26, 0.8);
+            border: 2px solid #ff0080;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            display: none;
+        }
+        
+        .admin-panel.visible {
+            display: block;
+        }
+        
+        .admin-panel::before {
+            content: "☠ DEVELOPER ACCESS ☠";
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 10px;
+            opacity: 0.5;
+        }
+        
+        .admin-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .admin-btn {
+            padding: 12px 20px;
+            background: rgba(255, 0, 128, 0.2);
+            border: 1px solid #ff0080;
+            color: #ff0080;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255, 0, 128, 0.4);
+            color: #fff;
+        }
+        
+        /* Карточки */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .info-card {
+            background: rgba(17, 17, 17, 0.8);
+            border: 1px solid #333;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+        
+        .info-card:hover {
+            border-color: #555;
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #00ffff;
+        }
+        
+        /* Прогресс бар */
+        .progress-container {
+            background: #222;
+            height: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            width: 0;
+            transition: width 0.5s;
         }
         
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: #00ffff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
+            animation: spin 1s infinite linear;
+            margin-right: 8px;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        .admin-only {
-            display: none;
-        }
-        
-        .user-admin .admin-only {
-            display: block;
-        }
-        
-        .tooltip {
-            position: relative;
-            cursor: help;
-        }
-        
-        .tooltip:after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 5px 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #00ffff;
-            border: 1px solid #00ffff;
-            border-radius: 4px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            z-index: 100;
-        }
-        
-        .tooltip:hover:after {
-            opacity: 1;
-            visibility: visible;
-            bottom: calc(100% + 10px);
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 5px;
-            background: rgba(26, 26, 46, 0.9);
-            border: 1px solid #00ffff;
-            color: #00ffff;
-            transform: translateX(100%);
-            transition: transform 0.3s;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .theme-switcher {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(26, 26, 46, 0.9);
-            border: 1px solid #00ffff;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            backdrop-filter: blur(5px);
-        }
-        
-        .progress-bar {
-            height: 5px;
-            background: linear-gradient(90deg, #ff00ff, #00ffff);
-            width: 0;
-            transition: width 0.5s;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        
-        .stats-container {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .stat-card {
-            flex: 1;
-            background: rgba(26, 26, 46, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #00ffff;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        /* Модальное окно */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal {
-            background: rgba(10, 10, 26, 0.95);
-            border: 2px solid #00ffff;
-            border-radius: 10px;
-            padding: 25px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-        
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            color: #00ffff;
-            font-size: 24px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .modal-close:hover {
-            transform: rotate(90deg);
-        }
-        
-        .code-info {
-            background: rgba(26, 26, 46, 0.8);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 3px solid #ff00ff;
-        }
-        
-        .code-type-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .code-type-btn {
-            flex: 1;
-            padding: 10px;
-            background: rgba(26, 26, 46, 0.8);
-            border: 1px solid #00ffff;
-            border-radius: 5px;
-            color: #00ffff;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .code-type-btn.active {
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            color: #000;
-        }
-        
+        /* Мобильная адаптация */
         @media (max-width: 768px) {
-            .container {
+            .main-title {
+                font-size: 32px;
+            }
+            
+            .navigation {
                 flex-direction: column;
-                height: auto;
+                align-items: center;
             }
             
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 2px solid #00ffff;
+            .nav-button {
+                width: 200px;
             }
             
-            .stats-container {
-                flex-direction: column;
+            .main-content {
+                padding: 30px 15px;
             }
             
-            .modal {
-                width: 95%;
-                padding: 15px;
+            .code-system,
+            .user-profile,
+            .code-input-area,
+            .codes-list,
+            .admin-panel {
+                padding: 20px;
             }
-        }
-        
-        /* Анимация активации кода */
-        @keyframes activate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 255, 0.8); }
-            100% { transform: scale(1); }
-        }
-        
-        .activating {
-            animation: activate 0.5s ease-in-out;
-        }
-        
-        /* Светлая тема */
-        .light-theme {
-            background: #f0f0f0;
-            color: #333;
-        }
-        
-        .light-theme .sidebar,
-        .light-theme .user-card,
-        .light-theme .code-section,
-        .light-theme .subscription-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-color: #666;
-            color: #333;
-        }
-        
-        .light-theme .form-input {
-            background: rgba(255, 255, 255, 0.9);
-            border-color: #666;
-            color: #333;
-        }
-        
-        .light-theme .btn-secondary {
-            background: rgba(100, 100, 100, 0.2);
-            color: #333;
-            border-color: #666;
-        }
-        
-        .light-theme .feature-list li:before {
-            color: #666;
-        }
-        
-        .light-theme .modal {
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            border-color: #666;
-        }
-        
-        .light-theme .code-info {
-            background: rgba(240, 240, 240, 0.9);
-            color: #333;
-        }
-        
-        .light-theme .code-type-btn {
-            background: rgba(240, 240, 240, 0.9);
-            border-color: #666;
-            color: #333;
+            
+            .info-cards {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="particles-js"></div>
+    <!-- Фон с символами Гастера -->
+    <div class="gaster-bg">☞☜☹☹⚐🕈 ❄☟☜ 👍⚐👎☜ ☞⚐☼ ✡⚐🕆☼ 👍☟⚐✋👍☜
+❄☟☜ 💧☜👍☼☜❄ ✋💧 ✋☠ ❄☟☜ ☠🕆💣👌☜☼💧
+☞☜☹☹ ⚡☞☜☹☹ ☞☜☹☹⚡ ✋☠❄⚐ ❄☟☜ 👎✌☼😐☠☜💧💧
+⚡🕈☟☜☼☜ ❄☟☜ 💧☟✌👎⚐🕈💧 ☞✌☹☹⚡
+✋ 🕈✋☹☹ ☝✋✞☜ ✡⚐🕆 ❄☟☜ 🏱⚐🕈☜☼
+⚡☜☼⚐ 💧☜✞☜☠ ⚡☜☼⚐ ❄🕈⚐ ⚡☜☼⚐ ⚐☠☜ 💧☜✞☜☠⚡
+❄☟☜ 👍⚐👎☜ ✋💧 ☟✋👎👎☜☠ ✋☠ 👎✌☼😐☠☜💧💧</div>
+    
+    <!-- Плавающие символы Гастера -->
+    <div class="gaster-symbol" style="top: 15%; left: 5%;">☞</div>
+    <div class="gaster-symbol" style="top: 25%; right: 10%;">☜</div>
+    <div class="gaster-symbol" style="top: 45%; left: 8%;">☠</div>
+    <div class="gaster-symbol" style="top: 65%; right: 12%;">⚡</div>
+    <div class="gaster-symbol" style="top: 85%; left: 15%;">❄</div>
     
     <div class="container">
-        <div class="sidebar">
-            <div class="user-card">
-                <h3>👑 Создатель</h3>
-                <p>Уровень: ∞</p>
-                <p>Подписка: <span class="vip-badge">MAX TIER</span></p>
-                <div class="progress-bar" id="subscriptionProgress"></div>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-primary admin-only" onclick="showGenerateCodeModal()">
-                    🎁 Создать код
-                </button>
-                <button class="btn btn-secondary" onclick="showStats()">
-                    📊 Показать статистику
-                </button>
-                <button class="btn btn-secondary" onclick="clearAllData()">
-                    🗑️ Очистить данные
-                </button>
-            </div>
-            
-            <div class="stats-container" id="statsContainer" style="display: none;">
-                <div class="stat-card">
-                    <div>Активировано кодов</div>
-                    <div class="stat-value" id="activatedCount">0</div>
-                    <div>из 10000</div>
-                </div>
-                <div class="stat-card">
-                    <div>Доступно кодов</div>
-                    <div class="stat-value" id="availableCount">2</div>
-                    <div>в системе</div>
-                </div>
-            </div>
+        <div class="header">
+            <h1 class="main-title">CORE SYSTEM</h1>
+        </div>
+        
+        <div class="navigation">
+            <button class="nav-button active" onclick="switchPage('main', this)">Главная</button>
+            <button class="nav-button" onclick="switchPage('codes', this)">Подарочные коды</button>
+            <button class="nav-button" onclick="switchPage('screenshots', this)">Скриншоты</button>
+            <button class="nav-button" onclick="switchPage('soundtracks', this)">Саундтреки</button>
+            <button class="nav-button" onclick="switchPage('download', this)">Скачать</button>
+            <button class="nav-button" onclick="switchPage('news', this)">Новости</button>
+            <button class="nav-button" onclick="switchPage('contacts', this)">Контакты</button>
+            <button class="nav-button" onclick="switchPage('socials', this)">Соцсети</button>
+            <button class="nav-button" onclick="switchPage('support', this)">Поддержка</button>
         </div>
         
         <div class="main-content">
-            <h2>🎁 Система подарочных кодов</h2>
-            
-            <div class="subscription-card">
-                <h3>🔥 ПОДПИСКА MAX TIER</h3>
-                <ul class="feature-list">
-                    <li>310 IQ режим мышления</li>
-                    <li>Зов Гостера (глубокий анализ)</li>
-                    <li>Прямая связь с разработчиками</li>
-                    <li>Эксклюзивные капсулы</li>
-                    <li>Приоритетная поддержка</li>
-                    <li>Ранний доступ к фичам</li>
-                </ul>
-            </div>
-            
-            <div class="code-section">
-                <h3>🔑 Активация кода</h3>
+            <!-- Главная страница -->
+            <div class="content-page active" id="main">
+                <h2 class="page-title">CORE SYSTEM</h2>
                 
-                <div class="form-group">
-                    <label class="form-label">Введите подарочный код:</label>
-                    <input type="text" class="form-input" id="giftCodeInput" placeholder="Введите код (например: DEV)" maxlength="10" onkeyup="validateCodeInput(this)">
-                    <div id="codeValidation" style="font-size: 12px; margin-top: 5px; color: #ff00ff;"></div>
+                <div class="text-content">
+                    <p>Добро пожаловать в CORE SYSTEM — центральную систему управления подарочными кодами и контентом. Здесь вы можете активировать секретные коды, управлять подписками и получать доступ к эксклюзивному контенту.</p>
                 </div>
                 
-                <button class="btn btn-primary" id="activateButton" onclick="activateGiftCode()">
-                    🚀 Активировать код
-                </button>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <h3 class="card-title">Система подписок</h3>
+                        <p>Три уровня доступа: <span class="subscription-badge badge-basic">Basic</span> для начинающих пользователей, <span class="subscription-badge badge-max-neo">Max Neo</span> для продвинутых функций и эксклюзивный <span class="subscription-badge badge-developer">Developer</span> только для создателя системы.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3 class="card-title">Подарочные коды</h3>
+                        <p>Система кодов открывает доступ к уникальному контенту. Секретный код разработчика спрятан в символах Гастера по всей системе — будьте внимательны к деталям.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3 class="card-title">Пасхалки Гастера</h3>
+                        <p>Доктор В.Д. Гастер оставил свои следы в системе. Плавающие символы, скрытые сообщения и зашифрованные коды ждут своих исследователей в темноте.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3 class="card-title">Безопасность</h3>
+                        <p>Все данные защищены современными методами шифрования. Система автоматически сохраняет прогресс и активированные коды в локальном хранилище.</p>
+                    </div>
+                </div>
                 
-                <div class="progress-bar" id="activationProgress"></div>
-                
-                <div id="activationStatus" class="status-message"></div>
-            </div>
-            
-            <div class="code-section">
-                <h3>📊 Активные коды</h3>
-                <div id="activeCodesList">
-                    <!-- Список активных кодов -->
+                <div class="text-content">
+                    <h2>О системе CORE</h2>
+                    <p>CORE SYSTEM была создана как универсальная платформа для управления цифровым контентом и подарочными кодами. Система объединяет в себе современные технологии безопасности с интуитивным интерфейсом.</p>
+                    
+                    <h3>Основные возможности:</h3>
+                    <ul>
+                        <li>Активация подарочных кодов с мгновенной проверкой</li>
+                        <li>Управление уровнями подписки и доступом</li>
+                        <li>Система достижений и прогресса пользователя</li>
+                        <li>Автоматическое сохранение всех изменений</li>
+                        <li>Скрытый контент для особо внимательных пользователей</li>
+                    </ul>
+                    
+                    <h2>Секреты системы</h2>
+                    <p>Внимательные пользователи заметят, что система полна загадок и скрытых элементов. Символы Гастера не случайно появляются в различных частях интерфейса — они могут содержать важную информацию.</p>
+                    
+                    <p>Особое внимание стоит обратить на фоновые элементы и плавающие символы. Иногда в них скрыты подсказки к секретным кодам или доступу к скрытым функциям.</p>
+                    
+                    <h3>Подсказка для исследователей</h3>
+                    <p>Если вы видите последовательность символов Гастера, попробуйте найти закономерность в их расположении. Некоторые коды скрыты прямо на виду, но требуют внимательного изучения.</p>
                 </div>
             </div>
-
-            <div class="code-section admin-only">
-                <h3>⚙️ Доступные коды в системе</h3>
-                <div id="systemCodesList">
-                    <!-- Список системных кодов -->
+            
+            <!-- Подарочные коды -->
+            <div class="content-page" id="codes">
+                <h2 class="page-title">Система подарочных кодов</h2>
+                
+                <div class="code-system">
+                    <div class="user-profile">
+                        <h3>👑 Создатель системы</h3>
+                        <p>Уровень доступа: ∞</p>
+                        <div>
+                            Подписка: <span class="subscription-badge badge-developer">DEVELOPER</span>
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.7; margin-top: 10px;">
+                            Статус: Онлайн | Последняя активность: сейчас
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-input-area">
+                        <h3 style="color: #00ffff; text-align: center; margin-bottom: 20px;">⚡ Активация подарочного кода ⚡</h3>
+                        <input type="text" class="code-input" id="codeInput" placeholder="ВВЕДИТЕ КОД" maxlength="20">
+                        <div id="codeValidation" style="font-size: 14px; margin: 10px 0; min-height: 20px;"></div>
+                        <button class="activate-button" id="activateBtn" onclick="activateCode()">🚀 АКТИВИРОВАТЬ КОД</button>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="activationProgress"></div>
+                        </div>
+                        <div class="status-message" id="statusMessage"></div>
+                    </div>
+                    
+                    <div class="codes-list">
+                        <h3 style="color: #ff9900; text-align: center; margin-bottom: 20px;">📊 Активированные коды</h3>
+                        <div id="activeCodesList">
+                            <div class="code-item">
+                                <div>
+                                    <div class="code-value">WELCOME</div>
+                                    <div style="font-size: 12px; opacity: 0.7;">Стартовый набор • Сегодня 15:30</div>
+                                </div>
+                                <div style="color: #00ff00;">✓ Активен</div>
+                            </div>
+                            <div class="code-item">
+                                <div>
+                                    <div class="code-value">BASIC</div>
+                                    <div style="font-size: 12px; opacity: 0.7;">Базовая подписка • Вчера 12:15</div>
+                                </div>
+                                <div style="color: #00ff00;">✓ Активен</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-panel visible" id="adminPanel">
+                        <h3 style="color: #ff0080; margin-bottom: 20px;">🔒 ПАНЕЛЬ РАЗРАБОТЧИКА</h3>
+                        <p style="opacity: 0.8; margin-bottom: 20px;">
+                            Эксклюзивный доступ к системным функциям. Только для создателя CORE SYSTEM.
+                        </p>
+                        
+                        <div class="admin-controls">
+                            <button class="admin-btn" onclick="generateCode()">Создать код</button>
+                            <button class="admin-btn" onclick="viewAllCodes()">Все коды системы</button>
+                            <button class="admin-btn" onclick="exportData()">Экспорт данных</button>
+                            <button class="admin-btn" onclick="clearAllData()">Очистить все</button>
+                            <button class="admin-btn" onclick="systemStats()">Статистика</button>
+                            <button class="admin-btn" onclick="gasterSecrets()">Секреты Гастера</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-content">
+                    <h2>Принцип работы кодов</h2>
+                    <p>Система подарочных кодов CORE использует многоуровневую проверку и шифрование. Каждый код имеет уникальную структуру и ограниченное количество активаций.</p>
+                    
+                    <h3>Типы кодов:</h3>
+                    <ul>
+                        <li><strong>Стартовые коды</strong> — базовые функции для новых пользователей</li>
+                        <li><strong>Подписочные коды</strong> — активация уровней Basic и Max Neo</li>
+                        <li><strong>Секретные коды</strong> — скрытый контент и пасхалки</li>
+                        <li><strong>Код разработчика</strong> — единственный в своем роде, зашифрован символами Гастера</li>
+                    </ul>
+                    
+                    <h3>Система подписок:</h3>
+                    <p><span class="subscription-badge badge-basic">Basic</span> — Доступ к базовому функционалу, стандартные коды, основной контент.</p>
+                    <p><span class="subscription-badge badge-max-neo">Max Neo</span> — Расширенные возможности, приоритетная поддержка, эксклюзивные коды.</p>
+                    <p><span class="subscription-badge badge-developer">Developer</span> — Полный доступ ко всем функциям, панель администратора, создание кодов.</p>
+                    
+                    <h2>Поиск секретного кода</h2>
+                    <p>Легендарный код разработчика спрятан в самой системе. Он состоит из последовательности цифр, но представлен в виде символов Wingdings от доктора Гастера.</p>
+                    
+                    <p style="background: rgba(17, 17, 17, 0.8); padding: 20px; border-left: 3px solid #ff00ff; margin: 20px 0;">
+                        <strong>Подсказка:</strong> Ищите повторяющиеся символы в фоновом тексте. Числа скрыты в темноте, но видны тем, кто знает, как смотреть. Последовательность из шести цифр откроет все тайны системы.
+                    </p>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно создания кода -->
-    <div class="modal-overlay" id="generateCodeModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>🎁 Создать новый код</h3>
-                <button class="modal-close" onclick="closeGenerateCodeModal()">&times;</button>
-            </div>
             
-            <div class="code-type-selector">
-                <button class="code-type-btn active" data-type="MAX_TIER">MAX TIER</button>
-                <button class="code-type-btn" data-type="STARTER">STARTER</button>
-                <button class="code-type-btn" data-type="CUSTOM">CUSTOM</button>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Код:</label>
-                <input type="text" class="form-input" id="newCodeValue" placeholder="Введите код (A-Z, 0-9)" maxlength="10">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Максимум использований:</label>
-                <input type="number" class="form-input" id="newCodeMaxUses" value="100" min="1" max="9999">
-            </div>
-            
-            <div class="code-info">
-                <h4>Информация о типе кода:</h4>
-                <p id="codeTypeInfo">MAX TIER код предоставляет полный доступ ко всем функциям системы.</p>
-            </div>
-            
-            <button class="btn btn-primary" onclick="generateNewCode()">
-                🎯 Создать код
-            </button>
-        </div>
-    </div>
-
-    <div class="theme-switcher" onclick="toggleTheme()">
-        🌙
-    </div>
-
-    <div class="notification" id="notification">
-        Это уведомление!
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Инициализация частиц
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: "#00ffff" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: "#00ffff",
-                    opacity: 0.4,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: "none",
-                    random: true,
-                    straight: false,
-                    out_mode: "out",
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: "canvas",
-                events: {
-                    onhover: { enable: true, mode: "grab" },
-                    onclick: { enable: true, mode: "push" },
-                    resize: true
-                }
-            },
-            retina_detect: true
-        });
-
-        // СЕКРЕТНЫЕ ПОДАРОЧНЫЕ КОДЫ
-        const GIFT_CODES = {
-            // Секретный код разработчика
-            'DEV': {
-                type: 'MAX_TIER',
-                rewards: ['310_IQ', 'GASTER_CALL', 'DEV_ACCESS'],
-                maxUses: 9999,
-                used: 0,
-                description: 'Максимальная подписка для избранных'
-            },
-            // Можно добавить другие коды
-            'WELCOME': {
-                type: 'STARTER',
-                rewards: ['COMMON_CAPSULE_3'],
-                maxUses: 1000,
-                used: 0,
-                description: 'Стартовый пакет для новичков'
-            }
-        };
-
-        // База активированных кодов
-        let activatedCodes = JSON.parse(localStorage.getItem('activated_codes')) || {};
-        let userSubscription = JSON.parse(localStorage.getItem('user_subscription')) || { level: 'FREE' };
-        let isAdmin = true; // В реальном приложении это должно определяться по-другому
-        let currentTheme = 'dark';
-
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            // Добавляем класс админа если пользователь админ
-            if (isAdmin) {
-                document.body.classList.add('user-admin');
-            }
-            
-            updateSubscriptionStatus();
-            updateActiveCodesList();
-            updateSystemCodesList();
-            updateStats();
-            
-            // Установка прогресса подписки
-            document.getElementById('subscriptionProgress').style.width = userSubscription.level === 'MAX_TIER' ? '100%' : '0%';
-            
-            // Инициализация обработчиков для модального окна
-            initCodeTypeSelector();
-        });
-
-        // Показать уведомление
-        function showNotification(message, duration = 3000) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, duration);
-        }
-
-        // Переключение темы
-        function toggleTheme() {
-            const themeSwitcher = document.querySelector('.theme-switcher');
-            if (currentTheme === 'dark') {
-                document.body.classList.add('light-theme');
-                themeSwitcher.innerHTML = '☀️';
-                currentTheme = 'light';
-            } else {
-                document.body.classList.remove('light-theme');
-                themeSwitcher.innerHTML = '🌙';
-                currentTheme = 'dark';
-            }
-        }
-
-        // Показать статистику
-        function showStats() {
-            const statsContainer = document.getElementById('statsContainer');
-            statsContainer.style.display = statsContainer.style.display === 'none' ? 'flex' : 'none';
-            updateStats();
-        }
-
-        // Обновление статистики
-        function updateStats() {
-            document.getElementById('activatedCount').textContent = Object.keys(activatedCodes).length;
-            document.getElementById('availableCount').textContent = Object.keys(GIFT_CODES).length;
-        }
-
-        // Валидация ввода кода
-        function validateCodeInput(input) {
-            const validationElement = document.getElementById('codeValidation');
-            const code = input.value.trim().toUpperCase();
-            
-            if (code.length === 0) {
-                validationElement.textContent = '';
-                return;
-            }
-            
-            // Проверка на допустимые символы
-            if (!/^[A-Z0-9]+$/.test(code)) {
-                validationElement.textContent = '❌ Только латинские буквы и цифры';
-                validationElement.style.color = '#ff0000';
-                return;
-            }
-            
-            // Проверка на существование кода
-            if (GIFT_CODES[code]) {
-                if (activatedCodes[code]) {
-                    validationElement.textContent = '⚠️ Код уже активирован';
-                    validationElement.style.color = '#ff9900';
-                } else if (GIFT_CODES[code].used >= GIFT_CODES[code].maxUses) {
-                    validationElement.textContent = '❌ Лимит активаций исчерпан';
-                    validationElement.style.color = '#ff0000';
-                } else {
-                    validationElement.textContent = '✅ Код действителен: ' + GIFT_CODES[code].description;
-                    validationElement.style.color = '#00ff00';
-                }
-            } else {
-                validationElement.textContent = '❌ Неизвестный код';
-                validationElement.style.color = '#ff0000';
-            }
-        }
-
-        // Активация подарочного кода
-        function activateGiftCode() {
-            const code = document.getElementById('giftCodeInput').value.trim().toUpperCase();
-            const statusElement = document.getElementById('activationStatus');
-            const activateButton = document.getElementById('activateButton');
-            const progressBar = document.getElementById('activationProgress');
-            const codeSection = document.querySelector('.code-section');
-            
-            if (!code) {
-                showStatus('❌ Введите код!', 'error');
-                return;
-            }
-            
-            // Валидация кода
-            if (!/^[A-Z0-9]+$/.test(code)) {
-                showStatus('❌ Код содержит недопустимые символы!', 'error');
-                return;
-            }
-            
-            const giftCode = GIFT_CODES[code];
-            
-            if (!giftCode) {
-                showStatus('❌ Неверный код!', 'error');
-                return;
-            }
-            
-            if (activatedCodes[code]) {
-                showStatus('❌ Код уже использован!', 'error');
-                return;
-            }
-            
-            if (giftCode.used >= giftCode.maxUses) {
-                showStatus('❌ Лимит активаций исчерпан!', 'error');
-                return;
-            }
-            
-            // Блокируем кнопку на время активации
-            activateButton.disabled = true;
-            activateButton.innerHTML = '<span class="loading"></span> Активация...';
-            
-            // Анимация активации
-            codeSection.classList.add('activating');
-            
-            // Анимация прогресс-бара
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 5;
-                progressBar.style.width = progress + '%';
+            <!-- Скриншоты -->
+            <div class="content-page" id="screenshots">
+                <h2 class="page-title">Галерея скриншотов</h2>
                 
-                if (progress >= 100) {
-                    clearInterval(interval);
+                <div class="text-content">
+                    <p>Визуальная документация CORE SYSTEM. Скриншоты интерфейса, примеры работы с кодами и демонстрация возможностей системы.</p>
                     
-                    // Активация кода
-                    activateCodeRewards(code, giftCode);
+                    <h2>Интерфейс системы</h2>
+                    <p>CORE SYSTEM использует темную цветовую схему с акцентами киберпанк-стилистики. Основные цвета: голубой (#00ffff) для активных элементов, пурпурный (#ff00ff) для важной информации и оранжевый (#ff9900) для предупреждений.</p>
                     
-                    showStatus('✅ Код активирован! Получены награды: ' + 
-                        giftCode.rewards.join(', ').replace(/_/g, ' '), 'success');
+                    <h3>Особенности дизайна:</h3>
+                    <ul>
+                        <li>Минималистичный интерфейс без лишних элементов</li>
+                        <li>Плавающие символы Гастера как декоративные элементы</li>
+                        <li>Анимированные переходы между страницами</li>
+                        <li>Адаптивный дизайн для всех типов устройств</li>
+                        <li>Скрытые пасхалки в фоновых элементах</li>
+                    </ul>
                     
-                    showNotification('Код активирован успешно!');
+                    <h2>Панель активации кодов</h2>
+                    <p>Центральный элемент системы — форма ввода подарочных кодов. Поддерживает валидацию в реальном времени, автоматическое приведение к верхнему регистру и защиту от некорректного ввода.</p>
                     
-                    // Обновление интерфейса
-                    updateSubscriptionStatus();
-                    updateActiveCodesList();
-                    updateStats();
+                    <h3>Процесс активации:</h3>
+                    <ul>
+                        <li>Ввод кода в специальное поле</li>
+                        <li>Мгновенная проверка на существование</li>
+                        <li>Анимированный процесс активации</li>
+                        <li>Подтверждение успешной активации</li>
+                        <li>Автоматическое обновление статуса пользователя</li>
+                    </ul>
                     
-                    // Очистка поля
-                    document.getElementById('giftCodeInput').value = '';
-                    document.getElementById('codeValidation').textContent = '';
+                    <h2>Администраторская панель</h2>
+                    <p>Доступна только пользователям с подпиской Developer. Позволяет управлять всеми аспектами системы кодов, просматривать статистику и создавать новые коды.</p>
                     
-                    // Сохранение
-                    giftCode.used++;
-                    activatedCodes[code] = {
-                        activatedAt: new Date().toISOString(),
-                        rewards: giftCode.rewards
-                    };
-                    localStorage.setItem('activated_codes', JSON.stringify(activatedCodes));
-                    
-                    // Разблокируем кнопку
-                    activateButton.disabled = false;
-                    activateButton.innerHTML = '🚀 Активировать код';
-                    
-                    // Сброс прогресс-бара
-                    setTimeout(() => {
-                        progressBar.style.width = '0';
-                        codeSection.classList.remove('activating');
-                    }, 1000);
-                }
-            }, 50);
-        }
-
-        // Показать статус
-        function showStatus(message, type) {
-            const statusElement = document.getElementById('activationStatus');
-            statusElement.className = 'status-message ' + type;
-            statusElement.innerHTML = message;
+                    <p style="background: rgba(66, 26, 26, 0.8); border: 2px solid #ff0080; padding: 20px; margin: 20px 0;">
+                        <strong>Внимание:</strong> Панель разработчика содержит мощные инструменты. Неправильное использование может привести к потере данных или нарушению работы системы.
+                    </p>
+                </div>
+            </div>
             
-            // Автоскрытие через 5 секунд
-            setTimeout(() => {
-                statusElement.innerHTML = '';
-                statusElement.className = 'status-message';
-            }, 5000);
-        }
-
-        // Активация наград кода
-        function activateCodeRewards(code, giftCode) {
-            switch(giftCode.type) {
-                case 'MAX_TIER':
-                    userSubscription = {
-                        level: 'MAX_TIER',
-                        features: giftCode.rewards,
-                        activated: new Date().toISOString()
-                    };
-                    document.getElementById('subscriptionProgress').style.width = '100%';
-                    break;
-                    
-                case 'STARTER':
-                    // Добавление капсул в инвентарь
-                    const inventory = JSON.parse(localStorage.getItem('user_inventory')) || {};
-                    inventory.COMMON = (inventory.COMMON || 0) + 3;
-                    localStorage.setItem('user_inventory', JSON.stringify(inventory));
-                    break;
-            }
-            
-            localStorage.setItem('user_subscription', JSON.stringify(userSubscription));
-        }
-
-        // Обновление статуса подписки
-        function updateSubscriptionStatus() {
-            const subscriptionInfo = document.querySelector('.user-card p:nth-child(3)');
-            if (userSubscription.level === 'MAX_TIER') {
-                subscriptionInfo.innerHTML = 'Подписка: <span class="vip-badge">MAX TIER</span>';
-            } else {
-                subscriptionInfo.innerHTML = 'Подписка: <span>Базовый уровень</span>';
-            }
-        }
-
-        // Обновление списка активных кодов
-        function updateActiveCodesList() {
-            const codesList = document.getElementById('activeCodesList');
-            codesList.innerHTML = '';
-            
-            if (Object.keys(activatedCodes).length === 0) {
-                codesList.innerHTML = '<p style="padding: 10px; text-align: center;">Нет активированных кодов</p>';
-                return;
-            }
-            
-            for (const [code, data] of Object.entries(activatedCodes)) {
-                const codeElement = document.createElement('div');
-                codeElement.className = 'code-item';
+            <!-- Саундтреки -->
+            <div class="content-page" id="soundtracks">
+                <h2 class="page-title">Звуковое оформление</h2>
                 
-                const date = new Date(data.activatedAt);
-                const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                <div class="text-content">
+                    <p>CORE SYSTEM использует минималистичное звуковое оформление, вдохновленное эстетикой киберпанк и научной фантастики.</p>
+                    
+                    <h2>Звуковые эффекты</h2>
+                    <p>Система включает набор звуков для обратной связи с пользователем:</p>
+                    
+                    <h3>Основные звуки:</h3>
+                    <ul>
+                        <li><strong>Успешная активация</strong> — мелодичный сигнал при правильном коде</li>
+                        <li><strong>Ошибка ввода</strong> — короткий предупреждающий звук</li>
+                        <li><strong>Переключение страниц</strong> — тонкий щелчок интерфейса</li>
+                        <li><strong>Hover эффекты</strong> — едва слышимые звуки при наведении</li>
+                        <li><strong>Секретные активации</strong> — особые звуки для скрытых функций</li>
+                    </ul>
+                    
+                    <h2>Атмосферные треки</h2>
+                    <p>Фоновая музыка создает погружающую атмосферу. Все треки написаны в стиле ambient/cyberpunk с элементами мистики.</p>
+                    
+                    <h3>Плейлист CORE SYSTEM:</h3>
+                    <ul>
+                        <li><strong>"Digital Void"</strong> — основная тема системы</li>
+                        <li><strong>"Code Fragments"</strong> — музыка для работы с кодами</li>
+                        <li><strong>"Gaster's Echo"</strong> — таинственный трек для секретных разделов</li>
+                        <li><strong>"System Override"</strong> — динамичная тема для админ-панели</li>
+                        <li><strong>"Empty Space"</strong> — минималистичный эмбиент для фона</li>
+                    </ul>
+                    
+                    <h2>Технические детали</h2>
+                    <p>Все звуки оптимизированы для веб-использования, имеют небольшой размер и высокое качество. Система поддерживает отключение звуков пользователем.</p>
+                    
+                    <h3>Форматы:</h3>
+                    <ul>
+                        <li>MP3 для широкой совместимости</li>
+                        <li>OGG для лучшего качества</li>
+                        <li>WAV для критически важных звуков</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Скачать -->
+            <div class="content-page" id="download">
+                <h2 class="page-title">Загрузки</h2>
                 
-                codeElement.innerHTML = `
-                    <div>
-                        <strong class="code-value">${code}</strong>
-                        <div><small>Активирован: ${formattedDate}</small></div>
+                <div class="text-content">
+                    <p>CORE SYSTEM доступна в нескольких вариантах для различных платформ и потребностей пользователей.</p>
+                    
+                    <h2>Веб-версия</h2>
+                    <p>Основная версия системы работает прямо в браузере без необходимости установки. Требует подключения к интернету для синхронизации данных.</p>
+                    
+                    <h3>Системные требования:</h3>
+                    <ul>
+                        <li>Современный веб-браузер (Chrome 80+, Firefox 75+, Safari 13+)</li>
+                        <li>JavaScript включен</li>
+                        <li>LocalStorage поддержка</li>
+                        <li>Разрешение экрана 1024x768 или выше</li>
+                    </ul>
+                    
+                    <h2>Автономная версия</h2>
+                    <p>Дес
+Вот мой код, щас скину тебе фото, ты все поймёшь сделай пожалуйста. <h2>Автономная версия</h2>
+                    <p>Десктопная версия CORE SYSTEM для работы без интернета. Включает все основные функции и расширенные возможности для разработчиков.</p>
+                    
+                    <div style="background: rgba(17, 17, 17, 0.8); border: 2px solid #00ffff; padding: 30px; margin: 30px 0; text-align: center;">
+                        <h3 style="color: #00ffff; margin-bottom: 20px;">💾 Загрузить CORE SYSTEM</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                            <div style="background: rgba(0, 255, 255, 0.1); padding: 20px; border: 1px solid #00ffff;">
+                                <h4>Windows</h4>
+                                <p>v2.1.0 - 15.7 MB</p>
+                                <button style="background: #00ffff; color: #000; border: none; padding: 10px 20px; cursor: pointer;">Скачать</button>
+                            </div>
+                            <div style="background: rgba(255, 0, 255, 0.1); padding: 20px; border: 1px solid #ff00ff;">
+                                <h4>macOS</h4>
+                                <p>v2.1.0 - 18.2 MB</p>
+                                <button style="background: #ff00ff; color: #000; border: none; padding: 10px 20px; cursor: pointer;">Скачать</button>
+                            </div>
+                            <div style="background: rgba(255, 153, 0, 0.1); padding: 20px; border: 1px solid #ff9900;">
+                                <h4>Linux</h4>
+                                <p>v2.1.0 - 12.4 MB</p>
+                                <button style="background: #ff9900; color: #000; border: none; padding: 10px 20px; cursor: pointer;">Скачать</button>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <small>${data.rewards.join(', ').replace(/_/g, ' ')}</small>
-                    </div>
-                `;
-                codesList.appendChild(codeElement);
-            }
-        }
-
-        // Обновление списка системных кодов
-        function updateSystemCodesList() {
-            const codesList = document.getElementById('systemCodesList');
-            codesList.innerHTML = '';
+                </div>
+            </div>
             
-            if (Object.keys(GIFT_CODES).length === 0) {
-                codesList.innerHTML = '<p style="padding: 10px; text-align: center;">Нет доступных кодов в системе</p>';
-                return;
-            }
-            
-            for (const [code, data] of Object.entries(GIFT_CODES)) {
-                const codeElement = document.createElement('div');
-                codeElement.className = 'code-item';
+            <!-- Новости -->
+            <div class="content-page" id="news">
+                <h2 class="page-title">Системные новости</h2>
                 
-                codeElement.innerHTML = `
-                    <div>
-                        <strong class="code-value">${code}</strong>
-                        <div><small>${data.description}</small></div>
+                <div class="text-content">
+                    <div style="background: rgba(17, 17, 17, 0.8); border-left: 3px solid #00ffff; padding: 20px; margin: 20px 0;">
+                        <h3 style="color: #00ffff;">📡 Обновление 2.1.0</h3>
+                        <p style="opacity: 0.7; font-size: 14px;">29 августа 2025</p>
+                        <p>Добавлена новая система подарочных кодов с улучшенным шифрованием. Исправлены ошибки в панели разработчика. Оптимизирована работа с символами Гастера.</p>
                     </div>
-                    <div>
-                        <small>Использовано: ${data.used}/${data.maxUses}</small>
-                        <div><small>Тип: ${data.type}</small></div>
-                    </div>
-                `;
-                codesList.appendChild(codeElement);
-            }
-        }
-
-        // Очистка всех данных
-        function clearAllData() {
-            if (confirm('Вы уверены, что хотите очистить все данные? Это действие нельзя отменить.')) {
-                localStorage.removeItem('activated_codes');
-                localStorage.removeItem('user_subscription');
-                activatedCodes = {};
-                userSubscription = { level: 'FREE' };
-                
-                // Сброс счетчиков использования кодов
-                for (const code in GIFT_CODES) {
-                    GIFT_CODES[code].used = 0;
-                }
-                
-                updateSubscriptionStatus();
-                updateActiveCodesList();
-                updateStats();
-                updateSystemCodesList();
-                
-                document.getElementById('subscriptionProgress').style.width = '0';
-                
-                showNotification('Все данные очищены!');
-            }
-        }
-
-        // Показать модальное окно создания кода
-        function showGenerateCodeModal() {
-            document.getElementById('generateCodeModal').classList.add('active');
-        }
-
-        // Закрыть модальное окно создания кода
-        function closeGenerateCodeModal() {
-            document.getElementById('generateCodeModal').classList.remove('active');
-        }
-
-        // Инициализация селектора типа кода
-        function initCodeTypeSelector() {
-            const buttons = document.querySelectorAll('.code-type-btn');
-            buttons.forEach(button => {
-                button.addEventListener('click', function() {
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
                     
-                    // Обновление информации о типе кода
-                    updateCodeTypeInfo(this.dataset.type);
-                });
-            });
-            
-            // Установка начальной информации
-            updateCodeTypeInfo('MAX_TIER');
-        }
-
-        // Обновление информации о типе кода
-        function updateCodeTypeInfo(type) {
-            const infoElement = document.getElementById('codeTypeInfo');
-            
-            switch(type) {
-                case 'MAX_TIER':
-                    infoElement.textContent = 'MAX TIER код предоставляет полный доступ ко всем функциям системы.';
-                    break;
-                case 'STARTER':
-                    infoElement.textContent = 'STARTER код предоставляет базовые награды для новых пользователей.';
-                    break;
-                case 'CUSTOM':
-                    infoElement.textContent = 'CUSTOM код позволяет настроить индивидуальные награды.';
-                    break;
-            }
-        }
-
-        // Генерация нового кода
-        function generateNewCode() {
-            const codeValue = document.getElementById('newCodeValue').value.trim().toUpperCase();
-            const maxUses = parseInt(document.getElementById('newCodeMaxUses').value);
-            const selectedType = document.querySelector('.code-type-btn.active').dataset.type;
-            
-            if (!codeValue) {
-                showNotification('Введите значение кода!', 2000);
-                return;
-            }
-            
-            if (!/^[A-Z0-9]+$/.test(codeValue)) {
-                showNotification('Код может содержать только латинские буквы и цифры!', 2000);
-                return;
-            }
-            
-            if (GIFT_CODES[codeValue]) {
-                showNotification('Такой код уже существует!', 2000);
-                return;
-            }
-            
-            if (isNaN(maxUses) || maxUses < 1) {
-                showNotification('Укажите корректное количество использований!', 2000);
-                return;
-            }
-            
-            // Определяем награды в зависимости от типа кода
-            let rewards = [];
-            let description = '';
-            
-            switch(selectedType) {
-                case 'MAX_TIER':
-                    rewards = ['310_IQ', 'GASTER_CALL', 'DEV_ACCESS'];
-                    description = 'Максимальная подписка для избранных';
-                    break;
-                case 'STARTER':
-                    rewards = ['COMMON_CAPSULE_3'];
-                    description = 'Стартовый пакет для новичков';
-                    break;
-                case 'CUSTOM':
-                    rewards = ['CUSTOM_REWARD'];
-                    description = 'Пользовательский код с особыми наградами';
-                    break;
-            }
-            
-            // Создаем новый код
-            GIFT_CODES[codeValue] = {
-                type: selectedType,
-                rewards: rewards,
-                maxUses: maxUses,
-                used: 0,
-                description: description
-            };
-            
-            // Обновляем список кодов
-            updateSystemCodesList();
-            updateStats();
-            
-            // Закрываем модальное окно
-            closeGenerateCodeModal();
-            
-            // Очищаем поля
-            document.getElementById('newCodeValue').value = '';
-            document.getElementById('newCodeMaxUses').value = '100';
-            
-            showNotification('Код успешно создан: ' + codeValue);
-        }
-    </script>
-</body>
-</html>
+                    <div style="background: rgba(17, 17, 17, 0.8); border-left: 3px solid #ff00ff; padding: 20px; margin: 20px 0;">
+                        <h3 style="color: #ff00ff;">🔒 Новый секретный код</h3>
+                        <p style="opacity: 0.7; font-size: 14px;">25 августа 2025</p>
+                        <p>В системе появился новый секретный код разработчика. Подсказки спрятаны в символах Wingdings доктора Гастера по всему интерфейсу.</p>
+                    </div>
+                    
+                    <div style="background: rgba(17, 17, 17, 0.8); border-left: 3px solid #ff9900; padding: 20px; margin: 20px 0;">
+                        <h3 style="color: #ff9900;">⚡ Улучшения производ
