@@ -364,6 +364,99 @@
             -webkit-text-fill-color: transparent;
         }
         
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: rgba(10, 10, 26, 0.95);
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #00ffff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .modal-close:hover {
+            transform: rotate(90deg);
+        }
+        
+        .code-info {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 3px solid #ff00ff;
+        }
+        
+        .code-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .code-type-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            color: #00ffff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .code-type-btn.active {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            color: #000;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -378,6 +471,11 @@
             
             .stats-container {
                 flex-direction: column;
+            }
+            
+            .modal {
+                width: 95%;
+                padding: 15px;
             }
         }
         
@@ -421,6 +519,23 @@
         
         .light-theme .feature-list li:before {
             color: #666;
+        }
+        
+        .light-theme .modal {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-color: #666;
+        }
+        
+        .light-theme .code-info {
+            background: rgba(240, 240, 240, 0.9);
+            color: #333;
+        }
+        
+        .light-theme .code-type-btn {
+            background: rgba(240, 240, 240, 0.9);
+            border-color: #666;
+            color: #333;
         }
     </style>
 </head>
@@ -501,6 +616,48 @@
                     <!-- Список активных кодов -->
                 </div>
             </div>
+
+            <div class="code-section admin-only">
+                <h3>⚙️ Доступные коды в системе</h3>
+                <div id="systemCodesList">
+                    <!-- Список системных кодов -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания кода -->
+    <div class="modal-overlay" id="generateCodeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🎁 Создать новый код</h3>
+                <button class="modal-close" onclick="closeGenerateCodeModal()">&times;</button>
+            </div>
+            
+            <div class="code-type-selector">
+                <button class="code-type-btn active" data-type="MAX_TIER">MAX TIER</button>
+                <button class="code-type-btn" data-type="STARTER">STARTER</button>
+                <button class="code-type-btn" data-type="CUSTOM">CUSTOM</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Код:</label>
+                <input type="text" class="form-input" id="newCodeValue" placeholder="Введите код (A-Z, 0-9)" maxlength="10">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Максимум использований:</label>
+                <input type="number" class="form-input" id="newCodeMaxUses" value="100" min="1" max="9999">
+            </div>
+            
+            <div class="code-info">
+                <h4>Информация о типе кода:</h4>
+                <p id="codeTypeInfo">MAX TIER код предоставляет полный доступ ко всем функциям системы.</p>
+            </div>
+            
+            <button class="btn btn-primary" onclick="generateNewCode()">
+                🎯 Создать код
+            </button>
         </div>
     </div>
 
@@ -585,10 +742,14 @@
             
             updateSubscriptionStatus();
             updateActiveCodesList();
+            updateSystemCodesList();
             updateStats();
             
             // Установка прогресса подписки
             document.getElementById('subscriptionProgress').style.width = userSubscription.level === 'MAX_TIER' ? '100%' : '0%';
+            
+            // Инициализация обработчиков для модального окна
+            initCodeTypeSelector();
         });
 
         // Показать уведомление
@@ -830,6 +991,34 @@
             }
         }
 
+        // Обновление списка системных кодов
+        function updateSystemCodesList() {
+            const codesList = document.getElementById('systemCodesList');
+            codesList.innerHTML = '';
+            
+            if (Object.keys(GIFT_CODES).length === 0) {
+                codesList.innerHTML = '<p style="padding: 10px; text-align: center;">Нет доступных кодов в системе</p>';
+                return;
+            }
+            
+            for (const [code, data] of Object.entries(GIFT_CODES)) {
+                const codeElement = document.createElement('div');
+                codeElement.className = 'code-item';
+                
+                codeElement.innerHTML = `
+                    <div>
+                        <strong class="code-value">${code}</strong>
+                        <div><small>${data.description}</small></div>
+                    </div>
+                    <div>
+                        <small>Использовано: ${data.used}/${data.maxUses}</small>
+                        <div><small>Тип: ${data.type}</small></div>
+                    </div>
+                `;
+                codesList.appendChild(codeElement);
+            }
+        }
+
         // Очистка всех данных
         function clearAllData() {
             if (confirm('Вы уверены, что хотите очистить все данные? Это действие нельзя отменить.')) {
@@ -838,9 +1027,15 @@
                 activatedCodes = {};
                 userSubscription = { level: 'FREE' };
                 
+                // Сброс счетчиков использования кодов
+                for (const code in GIFT_CODES) {
+                    GIFT_CODES[code].used = 0;
+                }
+                
                 updateSubscriptionStatus();
                 updateActiveCodesList();
                 updateStats();
+                updateSystemCodesList();
                 
                 document.getElementById('subscriptionProgress').style.width = '0';
                 
@@ -848,9 +1043,116 @@
             }
         }
 
-        // Функция для показа модального окна (заглушка)
+        // Показать модальное окно создания кода
         function showGenerateCodeModal() {
-            showNotification('Функция создания кодов доступна в полной версии');
+            document.getElementById('generateCodeModal').classList.add('active');
+        }
+
+        // Закрыть модальное окно создания кода
+        function closeGenerateCodeModal() {
+            document.getElementById('generateCodeModal').classList.remove('active');
+        }
+
+        // Инициализация селектора типа кода
+        function initCodeTypeSelector() {
+            const buttons = document.querySelectorAll('.code-type-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Обновление информации о типе кода
+                    updateCodeTypeInfo(this.dataset.type);
+                });
+            });
+            
+            // Установка начальной информации
+            updateCodeTypeInfo('MAX_TIER');
+        }
+
+        // Обновление информации о типе кода
+        function updateCodeTypeInfo(type) {
+            const infoElement = document.getElementById('codeTypeInfo');
+            
+            switch(type) {
+                case 'MAX_TIER':
+                    infoElement.textContent = 'MAX TIER код предоставляет полный доступ ко всем функциям системы.';
+                    break;
+                case 'STARTER':
+                    infoElement.textContent = 'STARTER код предоставляет базовые награды для новых пользователей.';
+                    break;
+                case 'CUSTOM':
+                    infoElement.textContent = 'CUSTOM код позволяет настроить индивидуальные награды.';
+                    break;
+            }
+        }
+
+        // Генерация нового кода
+        function generateNewCode() {
+            const codeValue = document.getElementById('newCodeValue').value.trim().toUpperCase();
+            const maxUses = parseInt(document.getElementById('newCodeMaxUses').value);
+            const selectedType = document.querySelector('.code-type-btn.active').dataset.type;
+            
+            if (!codeValue) {
+                showNotification('Введите значение кода!', 2000);
+                return;
+            }
+            
+            if (!/^[A-Z0-9]+$/.test(codeValue)) {
+                showNotification('Код может содержать только латинские буквы и цифры!', 2000);
+                return;
+            }
+            
+            if (GIFT_CODES[codeValue]) {
+                showNotification('Такой код уже существует!', 2000);
+                return;
+            }
+            
+            if (isNaN(maxUses) || maxUses < 1) {
+                showNotification('Укажите корректное количество использований!', 2000);
+                return;
+            }
+            
+            // Определяем награды в зависимости от типа кода
+            let rewards = [];
+            let description = '';
+            
+            switch(selectedType) {
+                case 'MAX_TIER':
+                    rewards = ['310_IQ', 'GASTER_CALL', 'DEV_ACCESS'];
+                    description = 'Максимальная подписка для избранных';
+                    break;
+                case 'STARTER':
+                    rewards = ['COMMON_CAPSULE_3'];
+                    description = 'Стартовый пакет для новичков';
+                    break;
+                case 'CUSTOM':
+                    rewards = ['CUSTOM_REWARD'];
+                    description = 'Пользовательский код с особыми наградами';
+                    break;
+            }
+            
+            // Создаем новый код
+            GIFT_CODES[codeValue] = {
+                type: selectedType,
+                rewards: rewards,
+                maxUses: maxUses,
+                used: 0,
+                description: description
+            };
+            
+            // Обновляем список кодов
+            updateSystemCodesList();
+            updateStats();
+            
+            // Закрываем модальное окно
+            closeGenerateCodeModal();
+            
+            // Очищаем поля
+            document.getElementById('newCodeValue').value = '';
+            document.getElementById('newCodeMaxUses').value = '100';
+            
+            showNotification('Код успешно создан: ' + codeValue);
         }
     </script>
 </body>
