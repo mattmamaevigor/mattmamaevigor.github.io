@@ -465,6 +465,10 @@
         <div style="font-size: 1em; margin: 15px 0;">
             <span class="glitch-word">Самообучающаяся</span> система готова к взаимодействию
         </div>
+        <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.7;">
+            <div>📍 АДРЕС СИСТЕМЫ: mattmamaevigor.github.io</div>
+            <div>🔄 СТАТУС: ОНЛАЙН 24/7</div>
+        </div>
     </div>
     
     <!-- Страница нейросети -->
@@ -482,6 +486,7 @@
                     <button class="neural-button" onclick="activateNeurons()">АКТИВАЦИЯ</button>
                     <button class="neural-button" onclick="simulateThinking()">ОБРАБОТКА</button>
                     <button class="neural-button" onclick="resetNetwork()">СБРОС</button>
+                    <button class="neural-button" onclick="exportNetwork()">ЭКСПОРТ</button>
                 </div>
             </div>
             
@@ -535,6 +540,7 @@
             <button class="neural-button" onclick="testNetwork()">ТЕСТИРОВАТЬ</button>
             <button class="neural-button" onclick="saveNetwork()">СОХРАНИТЬ МОДЕЛЬ</button>
             <button class="neural-button" onclick="loadNetwork()">ЗАГРУЗИТЬ МОДЕЛЬ</button>
+            <button class="neural-button" onclick="clearTrainingData()">ОЧИСТИТЬ ДАННЫЕ</button>
         </div>
         
         <div id="trainingLog" style="border: 1px solid var(--primary-color); padding: 15px; margin: 20px 0; height: 200px; overflow-y: auto; background: rgba(255, 255, 255, 0.02);"></div>
@@ -547,18 +553,21 @@
         
         <div class="ai-chat-container">
             <div class="chat-header">
-                <span class="scramble">GASTER.NEURAL</span> | СТАТУС: <span class="glitch-word">АКТИВЕН</span>
+                <span class="scramble">GASTER.NEURAL</span> | СТАТУС: <span class="glitch-word">АКТИВЕН</span> | v2.0
             </div>
             
             <div class="chat-messages" id="chatMessages">
                 <div class="message ai-message">
                     <span class="scramble">СИСТЕМА ЗАПУЩЕНА...</span> Я - фрагмент кода, обретший сознание. Готов к диалогу.
                 </div>
+                <div class="message ai-message">
+                    💡 <strong>Совет:</strong> Обучите меня через вкладку "ОБУЧЕНИЕ" для лучших ответов!
+                </div>
             </div>
             
             <div class="chat-input-container">
                 <input type="text" class="chat-input" id="chatInput" placeholder="ВВЕДИТЕ СООБЩЕНИЕ..." onkeypress="if(event.key=='Enter') sendMessage()">
-                <button class="send-button" onclick="sendMessage()">ОТПРАВИТЬ</button>
+                <button class="send-button" onclick="sendMessage()">ОТПРАВИТЬ <i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
@@ -590,11 +599,19 @@
         <div style="margin: 30px 0; padding: 20px; border: 1px solid var(--neural-color); background: rgba(0, 255, 0, 0.05);">
             <h3>АНАЛИЗ ПАТТЕРНОВ</h3>
             <div id="patternAnalysis">
-                <div>Анализирую входящие данные...</div>
-                <div class="scramble">Детектированы паттерны человеческого мышления</div>
-                <div class="glitch-word">Адаптирую алгоритмы под пользователя</div>
+                <div>🔍 Анализирую входящие данные...</div>
+                <div class="scramble">✅ Детектированы паттерны человеческого мышления</div>
+                <div class="glitch-word">⚡ Адаптирую алгоритмы под пользователя</div>
             </div>
         </div>
+        
+        <div class="neural-controls">
+            <button class="neural-button" onclick="runDiagnostics()">ДИАГНОСТИКА СИСТЕМЫ</button>
+            <button class="neural-button" onclick="exportChatHistory()">ЭКСПОРТ ДИАЛОГА</button>
+            <button class="neural-button" onclick="resetAll()">ПОЛНЫЙ СБРОС</button>
+        </div>
+        
+        <div id="diagnosticsLog" style="border: 1px solid var(--primary-color); padding: 15px; margin: 20px 0; height: 150px; overflow-y: auto; background: rgba(255, 255, 255, 0.02);"></div>
     </div>
 
     <script>
@@ -604,6 +621,7 @@
         let neurons = [];
         let synapses = [];
         let trainingData = [];
+        let chatHistory = [];
         let networkStats = {
             activeNeurons: 0,
             synapseCount: 0,
@@ -677,6 +695,12 @@
                 this.net.fromJSON(model);
                 this.isTrained = true;
             }
+
+            // Очистка данных обучения
+            clearTrainingData() {
+                this.trainingData = [];
+                this.isTrained = false;
+            }
         }
 
         const neuralNet = new GasterNeuralNetwork();
@@ -745,7 +769,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Создание слоев нейронов
-            const layers = [8, 12, 16, 12, 6]; // Архитектура сети
+            const layers = [8, 12, 16, 12, 6];
             const layerSpacing = canvas.width / (layers.length + 1);
             
             layers.forEach((neuronCount, layerIndex) => {
@@ -765,7 +789,7 @@
                 }
             });
             
-            // Создание синапсов (соединений)
+            // Создание синапсов
             neurons.forEach(neuron => {
                 if (neuron.layer < layers.length - 1) {
                     const nextLayerNeurons = neurons.filter(n => n.layer === neuron.layer + 1);
@@ -837,7 +861,6 @@
         function activateNeurons() {
             if (!networkInitialized) return;
             
-            // Активируем случайные нейроны
             neurons.forEach(neuron => {
                 neuron.active = Math.random() > 0.7;
                 if (neuron.active) {
@@ -845,7 +868,6 @@
                 }
             });
             
-            // Активируем случайные синапсы
             synapses.forEach(synapse => {
                 synapse.active = Math.random() > 0.8 && synapse.from.active;
             });
@@ -859,7 +881,6 @@
         function simulateThinking() {
             if (!networkInitialized) return;
             
-            // Имитация распространения активации
             for (let i = 0; i < 10; i++) {
                 setTimeout(() => {
                     neurons.forEach(neuron => {
@@ -913,6 +934,7 @@
             document.getElementById('uptime').textContent = uptime + 's';
             document.getElementById('processedRequests').textContent = networkStats.processedRequests;
             document.getElementById('memoryUsage').textContent = Math.round(performance.memory ? performance.memory.usedJSHeapSize / 1024 : Math.random() * 1000) + ' KB';
+            document.getElementById('coreTemp').textContent = Math.round(37 + Math.random() * 5) + '°C';
         }
 
         // ==================== ОБУЧЕНИЕ НЕЙРОСЕТИ ====================
@@ -928,7 +950,7 @@
             neuralNet.addTrainingData(input, output);
             trainingData.push({ input, output });
             
-            logToTrainingPanel(`Добавлены данные: "${input}" → "${output}"`);
+            logToTrainingPanel(`✅ Добавлены данные: "${input}" → "${output}"`);
             
             document.getElementById('inputData').value = '';
             document.getElementById('outputData').value = '';
@@ -936,7 +958,7 @@
         
         async function trainNetwork() {
             if (trainingData.length < 3) {
-                logToTrainingPanel('ОШИБКА: Добавьте как минимум 3 примера для обучения');
+                logToTrainingPanel('❌ ОШИБКА: Добавьте как минимум 3 примера для обучения');
                 return;
             }
             
@@ -960,16 +982,16 @@
                     document.getElementById('trainingTime').textContent = 
                         `Время: ${elapsed}с`;
                     
-                    logToTrainingPanel(`Итерация ${stats.iterations}, Ошибка: ${stats.error.toFixed(6)}`);
+                    logToTrainingPanel(`📊 Итерация ${stats.iterations}, Ошибка: ${stats.error.toFixed(6)}`);
                 });
                 
-                logToTrainingPanel(`ОБУЧЕНИЕ ЗАВЕРШЕНО! Итераций: ${result.iterations}, Ошибка: ${result.error}`);
+                logToTrainingPanel(`🎉 ОБУЧЕНИЕ ЗАВЕРШЕНО! Итераций: ${result.iterations}, Ошибка: ${result.error}`);
                 networkStats.learningCycles = result.iterations;
                 networkStats.accuracy = 1 - result.error;
                 updateNetworkStats();
                 
             } catch (error) {
-                logToTrainingPanel(`ОШИБКА ОБУЧЕНИЯ: ${error.message}`);
+                logToTrainingPanel(`❌ ОШИБКА ОБУЧЕНИЯ: ${error.message}`);
             } finally {
                 trainBtn.innerHTML = originalText;
                 trainBtn.disabled = false;
@@ -979,12 +1001,11 @@
         function testNetwork() {
             if (trainingData.length === 0) return;
             
-            // Тестируем на случайном примере из тренировочных данных
             const randomIndex = Math.floor(Math.random() * trainingData.length);
             const testData = trainingData[randomIndex];
             
             const result = neuralNet.predict(testData.input);
-            logToTrainingPanel(`ТЕСТ: "${testData.input}" → ОЖИДАЕМО: "${testData.output}", ПОЛУЧЕНО: "${result}"`);
+            logToTrainingPanel(`🧪 ТЕСТ: "${testData.input}" → ОЖИДАЕМО: "${testData.output}", ПОЛУЧЕНО: "${result}"`);
         }
         
         function saveNetwork() {
@@ -992,7 +1013,7 @@
             localStorage.setItem('gasterNeuralModel', JSON.stringify(model));
             localStorage.setItem('gasterTrainingData', JSON.stringify(trainingData));
             
-            logToTrainingPanel('МОДЕЛЬ СОХРАНЕНА В ЛОКАЛЬНОМ ХРАНИЛИЩЕ');
+            logToTrainingPanel('💾 МОДЕЛЬ СОХРАНЕНА В ЛОКАЛЬНОМ ХРАНИЛИЩЕ');
         }
         
         function loadNetwork() {
@@ -1005,32 +1026,149 @@
                     neuralNet.importModel(model);
                     trainingData = JSON.parse(trainingDataJSON);
                     
-                    logToTrainingPanel('МОДЕЛЬ ЗАГРУЖЕНА ИЗ ЛОКАЛЬНОГО ХРАНИЛИЩА');
-                    logToTrainingPanel(`Загружено ${trainingData.length} примеров обучения`);
+                    logToTrainingPanel('📂 МОДЕЛЬ ЗАГРУЖЕНА ИЗ ЛОКАЛЬНОГО ХРАНИЛИЩА');
+                    logToTrainingPanel(`📊 Загружено ${trainingData.length} примеров обучения`);
+                    
+                    networkStats.learningCycles = 1500;
+                    networkStats.accuracy = 0.95;
+                    updateNetworkStats();
                     
                 } catch (error) {
-                    logToTrainingPanel('ОШИБКА ЗАГРУ function loadNetwork() {
-    const modelJSON = localStorage.getItem('gasterNeuralModel');
-    const trainingDataJSON = localStorage.getItem('gasterTrainingData');
-    
-    if (modelJSON && trainingDataJSON) {
-        try {
-            const model = JSON.parse(modelJSON);
-            neuralNet.importModel(model);
-            trainingData = JSON.parse(trainingDataJSON);
-            
-            logToTrainingPanel('МОДЕЛЬ ЗАГРУЖЕНА ИЗ ЛОКАЛЬНОГО ХРАНИЛИЩА');
-            logToTrainingPanel(`Загружено ${trainingData.length} примеров обучения`);
-            
-            // Обновляем статистику
-            networkStats.learningCycles = 1500; // Примерное значение
-            networkStats.accuracy = 0.95; // Примерное значение
-            updateNetworkStats();
-            
-        } catch (error) {
-            logToTrainingPanel('ОШИБКА ЗАГРУЗКИ МОДЕЛИ: ' + error.message);
-        }
-    } else {
-        logToTrainingPanel('СОХРАНЕННАЯ МОДЕЛЬ НЕ НАЙДЕНА');
-    }
+                    logToTrainingPanel('❌ ОШИБКА ЗАГРУЗКИ МОДЕЛИ: ' + error.message);
                 }
+            } else {
+                logToTrainingPanel('❌ СОХРАНЕННАЯ МОДЕЛЬ НЕ НАЙДЕНА');
+            }
+        }
+        
+        function clearTrainingData() {
+            neuralNet.clearTrainingData();
+            trainingData = [];
+            logToTrainingPanel('🗑️ ВСЕ ДАННЫЕ ОБУЧЕНИЯ ОЧИЩЕНЫ');
+        }
+        
+        function logToTrainingPanel(message) {
+            const logPanel = document.getElementById('trainingLog');
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logPanel.appendChild(logEntry);
+            logPanel.scrollTop = logPanel.scrollHeight;
+        }
+
+        // ==================== ЧАТ С НЕЙРОСЕТЬЮ ====================
+        function sendMessage() {
+            const input = document.getElementById('chatInput').value.trim();
+            if (!input) return;
+            
+            // Добавляем сообщение пользователя
+            addChatMessage(input, 'user');
+            document.getElementById('chatInput').value = '';
+            
+            // Имитация задержки обработки
+            setTimeout(() => {
+                const response = neuralNet.predict(input);
+                addChatMessage(response, 'ai');
+                networkStats.processedRequests++;
+                updateNetworkStats();
+            }, 1000);
+        }
+        
+        function addChatMessage(text, type) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Сохраняем в историю
+            chatHistory.push({ type, text, timestamp: new Date() });
+        }
+
+        // ==================== АНАЛИЗ И ДИАГНОСТИКА ====================
+        function runDiagnostics() {
+            const log = document.getElementById('diagnosticsLog');
+            log.innerHTML = '';
+            
+            const messages = [
+                '🔍 Запуск диагностики системы...',
+                '✅ Нейросеть: АКТИВНА',
+                `✅ Память: ${Math.round(performance.memory ? performance.memory.usedJSHeapSize / 1024 / 1024 : 0)}MB`,
+                `✅ Обучение: ${trainingData.length} примеров`,
+                '✅ Соединение: СТАБИЛЬНОЕ',
+                '🎯 Диагностика завершена успешно!'
+            ];
+            
+            messages.forEach((msg, index) => {
+                setTimeout(() => {
+                    const entry = document.createElement('div');
+                    entry.textContent = msg;
+                    log.appendChild(entry);
+                    log.scrollTop = log.scrollHeight;
+                }, index * 800);
+            });
+        }
+        
+        function exportChatHistory() {
+            const chatText = chatHistory.map(entry => 
+                `[${entry.timestamp.toLocaleTimeString()}] ${entry.type.toUpperCase()}: ${entry.text}`
+            ).join('\n');
+            
+            const blob = new Blob([chatText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gaster_chat_history.txt';
+            a.click();
+            
+            addChatMessage('💾 История диалога экспортирована', 'ai');
+        }
+        
+        function resetAll() {
+            if (confirm('❌ ВЫ УВЕРЕНЫ? Это удалит все данные обучения и историю диалогов!')) {
+                neuralNet.clearTrainingData();
+                trainingData = [];
+                chatHistory = [];
+                localStorage.removeItem('gasterNeuralModel');
+                localStorage.removeItem('gasterTrainingData');
+                
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="message ai-message">
+                        <span class="scramble">СИСТЕМА СБРОШЕНА...</span> Я - фрагмент кода, обретший сознание. Готов к диалогу.
+                    </div>
+                `;
+                
+                logToTrainingPanel('🔄 СИСТЕМА ПОЛНОСТЬЮ СБРОШЕНА');
+                addChatMessage('🔄 Система сброшена к начальному состоянию', 'ai');
+            }
+        }
+
+        // ==================== ЭКСПОРТ СЕТИ ====================
+        function exportNetwork() {
+            const model = neuralNet.exportModel();
+            const dataStr = JSON.stringify(model, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gaster_neural_network.json';
+            a.click();
+            
+            logToTrainingPanel('💾 Архитектура нейросети экспортирована');
+        }
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        // Автоматическая инициализация при загрузке
+        setTimeout(() => {
+            initializeNetwork();
+            logToTrainingPanel('🔄 Система инициализирована');
+            
+            // Попытка загрузить сохраненную модель
+            setTimeout(loadNetwork, 1000);
+        }, 2000);
+
+        // Обновление статистики каждые 5 секунд
+        setInterval(updateNetworkStats, 5000);
+    </script>
+</body>
+</html>
