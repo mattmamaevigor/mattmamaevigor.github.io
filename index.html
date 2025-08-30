@@ -3,28 +3,177 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Core 1.0 - Ultimate AI</title>
+<title>CORE 1.0 - Ultimate AI</title>
 <style>
-    body { margin:0; font-family: 'Courier New', monospace; background:#111; color:#fff; overflow-x:hidden;}
-    .container { display:none; padding:20px;}
-    h1 { font-size:2.5em; text-align:center; margin-bottom:0; }
-    .subtitle { text-align:center; margin-top:0; color:#888;}
-    .mode-btn { padding:10px 20px; margin:5px; cursor:pointer; border:none; background:#222; color:#fff; }
-    .mode-btn.active { color:yellow; }
-    .form-group { margin-bottom:10px; }
-    input, select, textarea { width:100%; padding:8px; margin-top:5px; background:#222; color:#fff; border:none; border-radius:5px; }
-    button.btn { padding:10px; margin-top:10px; cursor:pointer; border:none; border-radius:5px; background:#4ecdc4; color:#111; font-weight:bold;}
-    #contentOutput { background:#000; padding:10px; min-height:150px; white-space:pre-wrap; border-radius:5px; margin-top:10px; }
-    .error-message { color:#ff6b6b; }
-    .gaster-glyph { position:absolute; font-size:20px; color:#0ff; animation: float 5s infinite; }
-    @keyframes float { 0% {transform:translateY(0);} 50% {transform:translateY(-20px);} 100% {transform:translateY(0);} }
-    .tariff-badge { position:fixed; top:10px; right:10px; background:#222; color:#4ecdc4; padding:5px 10px; border-radius:5px; display:none;}
-    .glitch-text { position:relative; display:inline-block; }
-    .glitch-text::after, .glitch-text::before { content:attr(data-text); position:absolute; left:0; top:0; }
-    .glitch-text::before { animation:glitch1 2s infinite; color:#f0f; }
-    .glitch-text::after { animation:glitch2 2s infinite; color:#0ff; }
-    @keyframes glitch1 { 0%{transform:translate(2px,0);} 20%{transform:translate(-2px,-2px);} 40%{transform:translate(2px,2px);} 60%{transform:translate(-2px,1px);} 80%{transform:translate(1px,-1px);} 100%{transform:translate(0,0);} }
-    @keyframes glitch2 { 0%{transform:translate(-2px,0);} 20%{transform:translate(2px,2px);} 40%{transform:translate(-2px,-2px);} 60%{transform:translate(2px,-1px);} 80%{transform:translate(-1px,1px);} 100%{transform:translate(0,0);} }
+    /* ------------------------ Основные стили ------------------------ */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+        background-color: #0f0f0f;
+        color: #fff;
+        overflow-x: hidden;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        margin: 0;
+        font-weight: normal;
+    }
+    button {
+        cursor: pointer;
+    }
+
+    /* ------------------------ Глитчи и анимации ------------------------ */
+    .glitch-text {
+        position: relative;
+        font-size: 48px;
+        color: #fff;
+        font-weight: bold;
+    }
+    .glitch-text::before,
+    .glitch-text::after {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+    }
+    .glitch-text::before {
+        animation: glitchTop 2s infinite linear alternate-reverse;
+        clip: rect(0, 900px, 0, 0);
+        color: #ff00c8;
+    }
+    .glitch-text::after {
+        animation: glitchBottom 2s infinite linear alternate-reverse;
+        clip: rect(0, 900px, 0, 0);
+        color: #00fff9;
+    }
+    @keyframes glitchTop {
+        0% { clip: rect(0, 900px, 0, 0); transform: translate(0,0);}
+        20% { clip: rect(0, 900px, 30px, 0); transform: translate(-2px,-2px);}
+        40% { clip: rect(10px, 900px, 50px, 0); transform: translate(2px,2px);}
+        60% { clip: rect(0, 900px, 30px, 0); transform: translate(-1px,1px);}
+        80% { clip: rect(5px, 900px, 40px, 0); transform: translate(1px,-1px);}
+        100% { clip: rect(0, 900px, 0, 0); transform: translate(0,0);}
+    }
+    @keyframes glitchBottom {
+        0% { clip: rect(0, 900px, 0, 0); transform: translate(0,0);}
+        20% { clip: rect(20px, 900px, 60px, 0); transform: translate(1px,2px);}
+        40% { clip: rect(10px, 900px, 50px, 0); transform: translate(-1px,-2px);}
+        60% { clip: rect(15px, 900px, 45px, 0); transform: translate(2px,1px);}
+        80% { clip: rect(10px, 900px, 40px, 0); transform: translate(-2px,0);}
+        100% { clip: rect(0, 900px, 0, 0); transform: translate(0,0);}
+    }
+
+    /* ------------------------ Глифы Гастера ------------------------ */
+    .gaster-glyph {
+        position: absolute;
+        font-size: 24px;
+        color: #fff;
+        user-select: none;
+        animation: floatGlyph 10s linear infinite;
+        pointer-events: none;
+    }
+    @keyframes floatGlyph {
+        0% { transform: translateY(0);}
+        50% { transform: translateY(-20px);}
+        100% { transform: translateY(0);}
+    }
+
+    /* ------------------------ Модальное окно тарифов ------------------------ */
+    .tariff-modal {
+        position: fixed;
+        top:0; left:0; right:0; bottom:0;
+        background: rgba(0,0,0,0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .tariff-content {
+        background: #111;
+        padding: 40px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 800px;
+        text-align: center;
+        box-shadow: 0 0 20px #00fff9;
+    }
+    .tariff-title {
+        font-size: 32px;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+    .tariff-options {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        margin-bottom: 20px;
+    }
+    .tariff-option {
+        background: #222;
+        padding: 20px;
+        border-radius: 10px;
+        width: 180px;
+        margin: 10px;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+    .tariff-option.selected {
+        background: #00fff9;
+        color: #000;
+    }
+    .tariff-option h3 {
+        margin-bottom: 10px;
+    }
+    .tariff-option ul {
+        list-style: none;
+        padding: 0;
+        font-size: 14px;
+    }
+    .select-tariff-btn {
+        background: #ff00c8;
+        border: none;
+        color: #fff;
+        font-size: 16px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+    .select-tariff-btn:hover {
+        background: #ff44e0;
+    }
+
+    /* ------------------------ Основной контейнер ------------------------ */
+    #mainContainer {
+        display: none;
+        padding: 20px;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .mode-selector {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .mode-btn {
+        background: #222;
+        border: 2px solid #00fff9;
+        color: #fff;
+        padding: 10px 20px;
+        margin: 0 5px;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+    .mode-btn.active {
+        background: #00fff9;
+        color: #000;
+    }
 </style>
 </head>
 <body>
@@ -38,134 +187,229 @@
 <div class="gaster-glyph" style="top:30%; left:75%;">❍</div>
 
 <!-- Модальное окно выбора тарифа -->
-<div class="tariff-modal" id="tariffModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;justify-content:center;align-items:center;flex-direction:column; z-index:999;">
-    <h2>Выберите тариф</h2>
-    <div style="display:flex; gap:10px;">
-        <button class="mode-btn" data-tier="basic">BASIC (10 запросов)</button>
-        <button class="mode-btn" data-tier="tester">TESTER (без ограничений)</button>
-        <button class="mode-btn" data-tier="developer">DEVELOPER (код)</button>
+<div class="tariff-modal" id="tariffModal">
+    <div class="tariff-content">
+        <h2 class="tariff-title">Выберите доступ</h2>
+        <div class="tariff-options">
+            <div class="tariff-option" data-tier="basic">
+                <h3>BASIC</h3>
+                <p>Бесплатно</p>
+                <ul>
+                    <li>5 запросов в день</li>
+                    <li>Базовые функции</li>
+                </ul>
+            </div>
+            <div class="tariff-option" data-tier="developer">
+                <h3>DEVELOPER</h3>
+                <p>По коду</p>
+                <ul>
+                    <li>Полный доступ</li>
+                    <li>API интеграция</li>
+                </ul>
+                <input type="text" id="devCodeInput" placeholder="Введите код доступа" style="display:none;">
+            </div>
+            <div class="tariff-option" data-tier="tester">
+                <h3>TESTER</h3>
+                <p>Неограничено</p>
+                <ul>
+                    <li>Неограниченные запросы</li>
+                    <li>Для тестеров</li>
+                </ul>
+                <input type="text" id="testerCodeInput" placeholder="Введите секретный код" style="display:none;">
+            </div>
+        </div>
+        <button class="select-tariff-btn" id="selectTariffBtn">Подтвердить</button>
     </div>
-    <input type="text" id="devCodeInput" placeholder="Введите код разработчика" style="display:none; margin-top:10px; padding:5px;"/>
-    <button class="btn" id="selectTariffBtn">Подтвердить</button>
 </div>
 
+<!-- Основной контейнер CORE 1.0 -->
 <div class="container" id="mainContainer">
-    <h1 class="glitch-text" data-text="Core 1.0">Core 1.0</h1>
-    <p class="subtitle">Ultimate AI Interface</p>
-
-    <div style="display:flex; gap:10px; margin-bottom:10px;">
+    <div class="header">
+        <h1 class="glitch-text" data-text="CORE 1.0">CORE 1.0</h1>
+        <p>Ultimate AI Interface</p>
+    </div>
+    <div class="mode-selector">
         <button class="mode-btn active" data-mode="code">Генерация кода</button>
         <button class="mode-btn" data-mode="text">Генерация текста</button>
     </div>
-
-    <div class="form-group" id="codeMode">
-        <label>Описание задачи:</label>
-        <textarea id="description" rows="4" placeholder="Опишите задачу или текст"></textarea>
-    </div>
-
-    <div class="form-group" id="textMode" style="display:none;">
-        <label>Описание текста:</label>
-        <textarea id="textDescription" rows="4" placeholder="Опишите текст"></textarea>
-    </div>
-
-    <button class="btn" id="generateBtn">Генерировать</button>
-    <div id="contentOutput">Здесь появится сгенерированный контент...</div>
-    <button class="btn" id="copyBtn">Копировать</button>
-
 </div>
 
-<div class="tariff-badge" id="tariffBadge">Текущий тариф: <span id="currentTier"></span></div>
-
 <script>
-const devCode = "070217";
-let currentTier = '';
-let currentMode = 'code';
-let lastGeneratedContent = '';
-let apiToken = "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";
-let generationCount = 0;
+    const devCode = "070217";
+    const testerCode = "LansBeholder";
+    let currentTier = "";
+    let currentMode = "code";
 
-// Глифы анимация
-document.querySelectorAll('.gaster-glyph').forEach(g=>{
-    g.style.animationDuration = (3 + Math.random()*3)+'s';
-    g.style.fontSize = (15 + Math.random()*25)+'px';
-});
-
-// Выбор тарифа
-document.querySelectorAll('.tariff-modal .mode-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.tariff-modal .mode-btn').forEach(b=>b.style.color='#fff');
-        btn.style.color='yellow';
-        if(btn.dataset.tier==='developer') document.getElementById('devCodeInput').style.display='block';
-        else document.getElementById('devCodeInput').style.display='none';
-    });
-});
-
-document.getElementById('selectTariffBtn').addEventListener('click', ()=>{
-    let selected = document.querySelector('.tariff-modal .mode-btn[style*="yellow"]');
-    if(!selected){ alert('Выберите тариф'); return; }
-    let tier = selected.dataset.tier;
-    if(tier==='developer'){
-        let code = document.getElementById('devCodeInput').value.trim();
-        if(code!==devCode){ alert('Неверный код'); return; }
-    }
-    currentTier = tier;
-    document.getElementById('tariffBadge').style.display='block';
-    document.getElementById('currentTier').textContent=tier.toUpperCase();
-    document.getElementById('tariffModal').style.display='none';
-});
-
-// Переключение режимов
-document.querySelectorAll('.mode-btn[data-mode]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-        currentMode = btn.dataset.mode;
-        document.querySelectorAll('.mode-btn[data-mode]').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        if(currentMode==='code'){
-            document.getElementById('codeMode').style.display='block';
-            document.getElementById('textMode').style.display='none';
-        } else {
-            document.getElementById('codeMode').style.display='none';
-            document.getElementById('textMode').style.display='block';
+    // ------------------------ Инициализация глифов ------------------------
+    function initGasterGlyphs() {
+        const glyphs = ['✡','❄','⌖','⯊','⛦','❍','⌑','⍟','⌬'];
+        for(let i=0;i<10;i++){
+            const g = document.createElement('div');
+            g.className = "gaster-glyph";
+            g.textContent = glyphs[Math.floor(Math.random()*glyphs.length)];
+            g.style.left = `${Math.random()*100}%`;
+            g.style.top = `${Math.random()*90}%`;
+            g.style.animationDelay = `${Math.random()*10}s`;
+            document.body.appendChild(g);
         }
-    });
-});
-
-// Генерация контента
-document.getElementById('generateBtn').addEventListener('click', async ()=>{
-    if(currentTier==='basic'){
-        if(generationCount>=10){ alert('Лимит 10 запросов исчерпан'); return; }
-        generationCount++;
     }
-    let prompt = currentMode==='code'? document.getElementById('description').value : document.getElementById('textDescription').value;
-    if(!prompt){ alert('Введите описание'); return; }
 
-    let outputEl = document.getElementById('contentOutput');
-    outputEl.textContent='Генерация...';
+    // ------------------------ Тарифы ------------------------
+    function initTariffModal() {
+        const options = document.querySelectorAll('.tariff-option');
+        const selectBtn = document.getElementById('selectTariffBtn');
+        const devInput = document.getElementById('devCodeInput');
+        const testerInput = document.getElementById('testerCodeInput');
 
-    try{
-        const response = await fetch("https://api-inference.huggingface.co/models/gpt2", {
-            method:"POST",
-            headers:{ "Authorization":"Bearer "+apiToken, "Content-Type":"application/json"},
-            body: JSON.stringify({inputs:prompt})
+        options.forEach(opt => {
+            opt.addEventListener('click', function() {
+                options.forEach(o=>o.classList.remove('selected'));
+                this.classList.add('selected');
+                devInput.style.display = this.dataset.tier==="developer"?"block":"none";
+                testerInput.style.display = this.dataset.tier==="tester"?"block":"none";
+            });
         });
-        const data = await response.json();
-        if(data.error){ outputEl.textContent='Ошибка генерации: '+data.error; return; }
-        // Hugging Face возвращает массив объектов с generated_text
-        if(Array.isArray(data) && data[0].generated_text) lastGeneratedContent = data[0].generated_text;
-        else if(data.hasOwnProperty('generated_text')) lastGeneratedContent = data.generated_text;
-        else lastGeneratedContent = JSON.stringify(data,null,2);
-        outputEl.textContent=lastGeneratedContent;
-    } catch(err){
-        outputEl.textContent='Ошибка запроса: '+err;
+
+        selectBtn.addEventListener('click', function(){
+            const selected = document.querySelector('.tariff-option.selected');
+            if(!selected){ alert("Выберите тариф!"); return;}
+            const tier = selected.dataset.tier;
+            if(tier==="developer"){
+                if(devInput.value===devCode){ activateTier("developer"); } 
+                else{ alert("Неверный код разработчика!"); return;}
+            } else if(tier==="tester"){
+                if(testerInput.value===testerCode){ activateTier("tester"); } 
+                else{ alert("Неверный код тестера!"); return;}
+            } else { activateTier("basic"); }
+        });
     }
-});
 
-// Копировать
-document.getElementById('copyBtn').addEventListener('click', ()=>{
-    if(!lastGeneratedContent) return;
-    navigator.clipboard.writeText(lastGeneratedContent).then(()=>alert('Скопировано!'));
-});
+    function activateTier(tier){
+        currentTier = tier;
+        document.getElementById('tariffModal').style.display = "none";
+        document.getElementById('mainContainer').style.display = "block";
+        alert(`Тариф ${tier.toUpperCase()} активирован!`);
+    }
+
+    // ------------------------ Инициализация ------------------------
+    document.addEventListener('DOMContentLoaded', function(){
+        initGasterGlyphs();
+        initTariffModal();
+    });
 </script>
-
 </body>
 </html>
+<!-- Часть 2: CORE 1.0 - генерация и API -->
+<div class="container" id="generatorContainer" style="display:none;">
+    <div class="header">
+        <h2>Генератор CORE 1.0</h2>
+    </div>
+    <div class="input-section">
+        <textarea id="userInput" rows="5" style="width:100%; padding:10px; border-radius:8px; border:2px solid #00fff9; background:#111; color:#fff;" placeholder="Введите текст или запрос..."></textarea>
+        <div style="margin-top:10px; text-align:right;">
+            <button id="generateBtn" style="padding:10px 20px; border:none; border-radius:8px; background:#ff00c8; color:#fff; font-size:16px; cursor:pointer;">Сгенерировать</button>
+        </div>
+        <p id="limitInfo" style="margin-top:10px; color:#ff00c8;"></p>
+    </div>
+    <div class="output-section" style="margin-top:20px;">
+        <h3>Результат:</h3>
+        <pre id="outputText" style="white-space:pre-wrap; background:#111; padding:20px; border-radius:8px; border:2px solid #00fff9;"></pre>
+        <button id="copyBtn" style="margin-top:10px; padding:10px 20px; border:none; border-radius:8px; background:#00fff9; color:#000; font-size:16px; cursor:pointer;">Скопировать</button>
+    </div>
+</div>
+
+<script>
+    const hfToken = "YOUR_HF_API_KEY"; // замените на свой Hugging Face токен
+    let requestCount = 0;
+    const maxRequestsBasic = 10;
+
+    function switchMode(mode){
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn=>btn.classList.remove('active'));
+        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+    }
+
+    document.querySelectorAll('.mode-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>switchMode(btn.dataset.mode));
+    });
+
+    const generatorContainer = document.getElementById('generatorContainer');
+    const mainContainer = document.getElementById('mainContainer');
+
+    function initGenerator() {
+        generatorContainer.style.display = "block";
+        mainContainer.style.display = "none";
+
+        const generateBtn = document.getElementById('generateBtn');
+        const userInput = document.getElementById('userInput');
+        const outputText = document.getElementById('outputText');
+        const copyBtn = document.getElementById('copyBtn');
+        const limitInfo = document.getElementById('limitInfo');
+
+        function updateLimitInfo(){
+            if(currentTier==="basic"){
+                limitInfo.textContent = `Запросов сегодня: ${requestCount}/${maxRequestsBasic}`;
+            } else if(currentTier==="developer" || currentTier==="tester"){
+                limitInfo.textContent = `Неограниченные запросы!`;
+            }
+        }
+        updateLimitInfo();
+
+        generateBtn.addEventListener('click', async ()=>{
+            if(currentTier==="basic" && requestCount >= maxRequestsBasic){
+                alert("Лимит исчерпан!"); return;
+            }
+            const prompt = userInput.value.trim();
+            if(!prompt){ alert("Введите запрос!"); return; }
+
+            outputText.textContent = "Генерация... Подождите.";
+
+            try{
+                const response = await fetch(`https://api-inference.huggingface.co/models/gpt2`, {
+                    method:"POST",
+                    headers:{
+                        "Authorization": `Bearer ${hfToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({inputs: prompt})
+                });
+                const data = await response.json();
+                if(data.error){
+                    outputText.textContent = "Ошибка API: " + data.error;
+                    return;
+                }
+                if(Array.isArray(data) && data[0].generated_text){
+                    outputText.textContent = data[0].generated_text;
+                } else if(data.hasOwnProperty('generated_text')){
+                    outputText.textContent = data.generated_text;
+                } else {
+                    outputText.textContent = JSON.stringify(data,null,2);
+                }
+                if(currentTier==="basic") requestCount++;
+                updateLimitInfo();
+            }catch(e){
+                outputText.textContent = "Ошибка запроса: " + e.message;
+            }
+        });
+
+        copyBtn.addEventListener('click', ()=>{
+            navigator.clipboard.writeText(outputText.textContent)
+            .then(()=>alert("Скопировано в буфер обмена!"))
+            .catch(()=>alert("Не удалось скопировать"));
+        });
+    }
+
+    // ------------------------ Показ генератора после выбора тарифа ------------------------
+    function activateTier(tier){
+        currentTier = tier;
+        document.getElementById('tariffModal').style.display = "none";
+        mainContainer.style.display = "block";
+        initGenerator();
+        alert(`Тариф ${tier.toUpperCase()} активирован!`);
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        initGasterGlyphs();
+        initTariffModal();
+    });
+</script>
