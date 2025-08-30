@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GasterGen - Кибер-генератор</title>
     <style>
+        /* Стили остаются без изменений */
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap');
         
         * {
@@ -237,6 +238,7 @@
             width: 100%;
             font-family: 'Share Tech Mono', monospace;
             letter-spacing: 2px;
+            display: none;
         }
 
         .dev-code-input::placeholder {
@@ -853,18 +855,8 @@
     </div>
 
     <script>
-        // Скрытые части кода доступа Developer (070217)
-        // Часть 1: 07
-        const part1 = String.fromCharCode(48 + 7);
-        
-        // Часть 2: 02 
-        const part2 = String.fromCharCode(48) + String.fromCharCode(48 + 2);
-        
-        // Часть 3: 17
-        const part3 = String.fromCharCode(48 + 1) + String.fromCharCode(48 + 7);
-        
-        // Полный код доступа
-        const devCode = part1 + part2 + part3;
+        // Исправленный код доступа разработчика
+        const devCode = "070217";
         
         let apiToken = '';
         let lastGeneratedContent = '';
@@ -895,8 +887,17 @@
             
             options.forEach(option => {
                 option.addEventListener('click', function() {
-                    options.forEach(opt => opt.classList.remove('selected'));
+                    options.forEach(opt => {
+                        opt.classList.remove('selected');
+                        const devInputInOpt = opt.querySelector('.dev-code-input');
+                        if (devInputInOpt) devInputInOpt.style.display = 'none';
+                    });
                     this.classList.add('selected');
+                    
+                    // Показываем поле ввода только для developer тарифа
+                    if (this.getAttribute('data-tier') === 'developer') {
+                        devInput.style.display = 'block';
+                    }
                 });
             });
             
@@ -983,10 +984,17 @@
             if (apiToken) {
                 statusSpan.textContent = ' ✅ Токен сохранен';
                 statusSpan.style.color = '#4ecdc4';
+                // Сохраняем токен в localStorage
+                localStorage.setItem('hfApiToken', apiToken);
             } else {
                 statusSpan.textContent = ' ❌ Введите токен';
                 statusSpan.style.color = '#ff6b6b';
             }
+            
+            // Скрываем сообщение через 3 секунды
+            setTimeout(() => {
+                statusSpan.textContent = '';
+            }, 3000);
         }
 
         function setCodeExample(language, taskType, description, functionName = '') {
@@ -1003,8 +1011,22 @@
 
         async function generateContent() {
             if (!apiToken) {
-                alert('Сначала введите и сохраните API токен!');
-                return;
+                // Проверяем, есть ли токен в localStorage
+                const savedToken = localStorage.getItem('hfApiToken');
+                if (savedToken) {
+                    apiToken = savedToken;
+                    document.getElementById('apiToken').value = savedToken;
+                    document.getElementById('tokenStatus').textContent = ' ✅ Токен загружен из памяти';
+                    document.getElementById('tokenStatus').style.color = '#4ecdc4';
+                    
+                    // Скрываем сообщение через 3 секунды
+                    setTimeout(() => {
+                        document.getElementById('tokenStatus').textContent = '';
+                    }, 3000);
+                } else {
+                    alert('Сначала введите и сохраните API токен!');
+                    return;
+                }
             }
 
             if (currentTier === 'basic') {
@@ -1178,44 +1200,73 @@
             const maxTokens = currentMode === 'text' ? 400 : 200;
             const temperature = currentMode === 'text' ? 0.7 : 0.3;
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    inputs: prompt,
-                    parameters: {
-                        max_new_tokens: maxTokens,
-                        temperature: temperature,
-                        do_sample: true,
-                        top_p: 0.9,
-                        repetition_penalty: 1.1
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiToken}`,
+                        'Content-Type': 'application/json',
                     },
-                    options: {
-                        wait_for_model: true,
-                        use_cache: false
+                    body: JSON.stringify({
+                        inputs: prompt,
+                        parameters: {
+                            max_new_tokens: maxTokens,
+                            temperature: temperature,
+                            do_sample: true,
+                            top_p: 0.9,
+                            repetition_penalty: 1.1
+                        },
+                        options: {
+                            wait_for_model: true,
+                            use_cache: false
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                // Обработка разных форматов ответов от Hugging Face API
+                let generatedText = '';
+                
+                if (Array.isArray(result) && result.length > 0) {
+                    if (result[0].generated_text !== undefined) {
+                        generatedText = result[0].generated_text;
+                    } else if (result[0].translation_text !== undefined) {
+                        generatedText = result[0].translation_text;
+                    } else if (result[0].summary_text !== undefined) {
+                        generatedText = result[0].summary_text;
+                    } else {
+                        // Попытка извлечь текст из любого другого формата
+                        generatedText = JSON.stringify(result[0]);
                     }
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            
-            if (Array.isArray(result) && result.length > 0) {
-                const generatedText = result[0].generated_text || '';
+                } else if (result.generated_text !== undefined) {
+                    generatedText = result.generated_text;
+                } else if (result.translation_text !== undefined) {
+                    generatedText = result.translation_text;
+                } else if (result.summary_text !== undefined) {
+                    generatedText = result.summary_text;
+                } else {
+                    generatedText = JSON.stringify(result);
+                }
+                
+                // Удаляем исходный промпт, если он присутствует в ответе
+                if (generatedText.startsWith(prompt)) {
+                    generatedText = generatedText.slice(prompt.length);
+                }
+                
                 return {
                     success: true,
-                    content: generatedText
+                    content: generatedText.trim()
                 };
-            } else {
+            } catch (error) {
                 return {
                     success: false,
-                    error: 'Пустой ответ от API'
+                    error: error.message
                 };
             }
         }
@@ -1224,7 +1275,11 @@
             if (lastGeneratedContent) {
                 navigator.clipboard.writeText(lastGeneratedContent).then(() => {
                     alert('Контент скопирован в буфер обмена!');
+                }).catch(err => {
+                    alert('Не удалось скопировать контент: ' + err);
                 });
+            } else {
+                alert('Сначала сгенерируйте контент!');
             }
         }
 
@@ -1251,7 +1306,9 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = filename;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             
             URL.revokeObjectURL(url);
         }
@@ -1262,6 +1319,15 @@
             document.getElementById('contentOutput').textContent = 'Здесь появится сгенерированный контент...';
             lastGeneratedContent = '';
         }
+        
+        // Загрузка сохраненного токена при загрузке страницы
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedToken = localStorage.getItem('hfApiToken');
+            if (savedToken) {
+                apiToken = savedToken;
+                document.getElementById('apiToken').value = savedToken;
+            }
+        });
     </script>
 </body>
 </html>
