@@ -496,8 +496,8 @@
                     </div>
                     
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="chatInput" placeholder="Введите сообщение..." style="flex: 1; padding: 15px; background: #111; border: 2px solid #333; color: #fff; font-family: inherit;" onkeypress="if(event.key==='Enter')sendMessage()">
-                        <button id="sendBtn" onclick="sendMessage()" style="padding: 15px 30px; background: linear-gradient(45deg, #00ffff, #ff00ff); border: none; color: #000; font-weight: bold; cursor: pointer;">Отправить</button>
+                        <input type="text" id="chatInput" placeholder="Введите сообщение..." style="flex: 1; padding: 15px; background: #111; border: 2px solid #333; color: #fff; font-family: inherit;" onkeypress="if(event.key==='Enter'){event.preventDefault();sendMessage();}">
+                        <button type="button" id="sendBtn" onclick="event.preventDefault();sendMessage();" style="padding: 15px 30px; background: linear-gradient(45deg, #00ffff, #ff00ff); border: none; color: #000; font-weight: bold; cursor: pointer;">Отправить</button>
                     </div>
                 </div>
             </div>
